@@ -6,14 +6,19 @@
   "scripts": {
     "build": "rimraf ./build && tsc",
     "start": "npm run build && node build/index.js",
-    "start:dev": "npx nodemon"
+    "start:dev": "npx nodemon",
+    "test": "jest",
+    "test:watch": "npm run test -- --watch"
   },
   "author": "Dayvson Almeida",
   "license": "ISC",
   "devDependencies": {
+    "@types/jest": "^29.2.5",
     "@types/node": "^18.11.18",
+    "jest": "^29.3.1",
     "nodemon": "^2.0.20",
     "rimraf": "^3.0.2",
+    "ts-jest": "^29.0.3",
     "ts-node": "^10.9.1",
     "typescript": "^4.9.4"
   }
