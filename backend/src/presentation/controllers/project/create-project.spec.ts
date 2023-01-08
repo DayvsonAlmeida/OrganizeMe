@@ -1,3 +1,4 @@
+import { MissingParamError } from "./create-project.protocols";
 import { CreateProjectController, Request } from "./create-project.controller";
 
 type SutTypes = {
@@ -16,6 +17,7 @@ describe("CreateProject Controller", () => {
     const httpResponse = await sut.handle(httpRequest);
 
     expect(httpResponse.statusCode).toBe(400);
+    expect(httpResponse.body).toEqual(new MissingParamError("name"));
   });
 
   it("should return 400 if no name is provided", async () => {
@@ -25,5 +27,6 @@ describe("CreateProject Controller", () => {
     const httpResponse = await sut.handle(httpRequest);
 
     expect(httpResponse.statusCode).toBe(400);
+    expect(httpResponse.body).toEqual(new MissingParamError("name"));
   });
 });
