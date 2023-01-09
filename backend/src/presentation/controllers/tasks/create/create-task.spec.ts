@@ -1,8 +1,11 @@
+import { Project } from "../../project/create/create-project.protocols";
 import { CreateTaskController } from "./create-task.controller";
 import {
   MissingParamError,
-  DeadLineValidator,
   InvalidParamError,
+  DeadLineValidator,
+  FindProject,
+  FindProjectInput,
 } from "./create-task.protocols";
 
 const makeDeadLineValidator = (): DeadLineValidator => {
@@ -15,16 +18,34 @@ const makeDeadLineValidator = (): DeadLineValidator => {
   return new DeadLineValidatorStub();
 };
 
+const makeFindProject = (): FindProject => {
+  class FindProjectStub implements FindProject {
+    async find({ id }: FindProjectInput): Promise<Project | null> {
+      return {
+        id,
+        name: "Awesome Project",
+      };
+    }
+  }
+
+  return new FindProjectStub();
+};
+
 type SutTypes = {
   sut: CreateTaskController;
   deadLineValidatorStub: DeadLineValidator;
+  findProjectStub: FindProject;
 };
 
 const makeSut = (): SutTypes => {
   const deadLineValidatorStub = makeDeadLineValidator();
+  const findProjectStub = makeFindProject();
+  const sut = new CreateTaskController(deadLineValidatorStub, findProjectStub);
+
   return {
     deadLineValidatorStub,
-    sut: new CreateTaskController(deadLineValidatorStub),
+    findProjectStub,
+    sut,
   };
 };
 
@@ -133,5 +154,23 @@ describe("CreateTask Controller", () => {
 
     expect(httpResponse.statusCode).toBe(400);
     expect(httpResponse.body).toEqual(new InvalidParamError("deadLine"));
+  });
+
+  it("should call findProject with correct values", async () => {
+    const { sut, findProjectStub } = makeSut();
+    const findSpy = jest.spyOn(findProjectStub, "find");
+    const httpRequest = {
+      body: {
+        name: "Join to the 104th Training Corps",
+        responsible: "Eren",
+        deadLine: "13/01/2023",
+        projectId: "awesome-id",
+      },
+    };
+
+    await sut.handle(httpRequest);
+
+    expect(findSpy).toHaveBeenCalledTimes(1);
+    expect(findSpy).toHaveBeenCalledWith({ id: "awesome-id" });
   });
 });
