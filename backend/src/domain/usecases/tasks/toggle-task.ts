@@ -2,7 +2,7 @@ import { Task } from "../../entities/task";
 
 export type ToggleTaskInput = {
   id: string;
-  toggle: boolean;
+  done: boolean;
 };
 
 export interface ToggleTask {
