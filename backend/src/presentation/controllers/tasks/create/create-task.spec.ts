@@ -295,4 +295,26 @@ describe("CreateTask Controller", () => {
     expect(httpResponse.statusCode).toBe(500);
     expect(httpResponse.body).toEqual(new ServerError());
   });
+
+  it("should return 200", async () => {
+    const { sut } = makeSut();
+    const httpRequest = {
+      body: {
+        name: "Join to the 104th Training Corps",
+        responsible: "Eren",
+        deadLine: "13/01/2023",
+        projectId: "awesome-id",
+      },
+    };
+
+    const httpResponse = await sut.handle(httpRequest);
+
+    expect(httpResponse.statusCode).toBe(200);
+    expect(httpResponse.body).toEqual({
+      name: "Join to the 104th Training Corps",
+      responsible: "Eren",
+      deadLine: new Date("2023-1-13"),
+      id: "awesome-task-id",
+    });
+  });
 });
