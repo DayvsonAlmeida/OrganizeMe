@@ -66,7 +66,7 @@ export class CreateTaskController implements Controller<CreateTaskInput, Task> {
         deadLine: deadLineDate,
       });
 
-      return ok({});
+      return ok(task);
     } catch {
       return serverError();
     }
