@@ -1,8 +1,9 @@
 import {
-  MissingParamError,
   AddProject,
   Project,
   AddProjectInput,
+  MissingParamError,
+  ServerError,
 } from "./create-project.protocols";
 import { CreateProjectController, Request } from "./create-project.controller";
 
@@ -61,5 +62,19 @@ describe("CreateProject Controller", () => {
     await sut.handle(httpRequest);
 
     expect(addSpy).toHaveBeenCalledWith({ name: "My Project" });
+  });
+
+  it("should return 500 if AddProject throws", async () => {
+    const { sut, addProjectStub } = makeSut();
+    const httpRequest = { body: { name: "My Project" } };
+
+    jest.spyOn(addProjectStub, "add").mockImplementationOnce(() => {
+      return new Promise((_, reject) => reject(new Error()));
+    });
+
+    const httpResponse = await sut.handle(httpRequest);
+
+    expect(httpResponse.statusCode).toBe(500);
+    expect(httpResponse.body).toEqual(new ServerError());
   });
 });
