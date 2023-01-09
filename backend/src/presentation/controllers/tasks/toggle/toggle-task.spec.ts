@@ -5,6 +5,7 @@ import {
 } from "./toggle-task.controller";
 import {
   MissingParamError,
+  ServerError,
   Task,
   ToggleTask,
   ToggleTaskInput,
@@ -18,6 +19,7 @@ const makeToggleTask = (): ToggleTask => {
         name: "Join to the 104th Training Corps",
         responsible: "Eren",
         deadLine: new Date("2023-1-13"),
+        done: task.done,
       };
     }
   }
@@ -76,5 +78,43 @@ describe("ToggleTask Controller", () => {
 
     expect(toggleSpy).toBeCalledTimes(1);
     expect(toggleSpy).toHaveBeenCalledWith({ id: "awesome-id", done: true });
+  });
+
+  it("should return 500 if ToggleTask throws", async () => {
+    const { sut, toggleTaskStub } = makeSut();
+    const httpRequest: Request = {
+      params: { id: "awesome-id" },
+      body: { done: true },
+    };
+
+    jest
+      .spyOn(toggleTaskStub, "toggle")
+      .mockImplementationOnce(
+        () => new Promise((_, reject) => reject(new Error()))
+      );
+
+    const httpResponse = await sut.handle(httpRequest);
+
+    expect(httpResponse.statusCode).toBe(500);
+    expect(httpResponse.body).toEqual(new ServerError());
+  });
+
+  it("should return 200", async () => {
+    const { sut } = makeSut();
+    const httpRequest: Request = {
+      params: { id: "awesome-id" },
+      body: { done: true },
+    };
+
+    const httpResponse = await sut.handle(httpRequest);
+
+    expect(httpResponse.statusCode).toBe(200);
+    expect(httpResponse.body).toEqual({
+      id: "awesome-id",
+      name: "Join to the 104th Training Corps",
+      responsible: "Eren",
+      deadLine: new Date("2023-1-13"),
+      done: true,
+    });
   });
 });
