@@ -8,6 +8,9 @@ import {
   DeadLineValidator,
   FindProject,
   FindProjectInput,
+  AddTask,
+  AddTaskInput,
+  Task,
 } from "./create-task.protocols";
 
 const makeDeadLineValidator = (): DeadLineValidator => {
@@ -33,20 +36,47 @@ const makeFindProject = (): FindProject => {
   return new FindProjectStub();
 };
 
+const makeAddTask = (): AddTask => {
+  class AddTaskStub implements AddTask {
+    async add({
+      deadLine,
+      name,
+      responsible,
+      projectId,
+    }: AddTaskInput): Promise<Task> {
+      return {
+        id: "awesome-task-id",
+        deadLine,
+        name,
+        responsible,
+      };
+    }
+  }
+
+  return new AddTaskStub();
+};
+
 type SutTypes = {
   sut: CreateTaskController;
   deadLineValidatorStub: DeadLineValidator;
   findProjectStub: FindProject;
+  addTaskStub: AddTask;
 };
 
 const makeSut = (): SutTypes => {
   const deadLineValidatorStub = makeDeadLineValidator();
   const findProjectStub = makeFindProject();
-  const sut = new CreateTaskController(deadLineValidatorStub, findProjectStub);
+  const addTaskStub = makeAddTask();
+  const sut = new CreateTaskController(
+    deadLineValidatorStub,
+    findProjectStub,
+    addTaskStub
+  );
 
   return {
     deadLineValidatorStub,
     findProjectStub,
+    addTaskStub,
     sut,
   };
 };
@@ -218,5 +248,28 @@ describe("CreateTask Controller", () => {
 
     expect(httpResponse.statusCode).toBe(500);
     expect(httpResponse.body).toEqual(new ServerError());
+  });
+
+  it("should call addTask with correct values", async () => {
+    const { sut, addTaskStub } = makeSut();
+    const addSpy = jest.spyOn(addTaskStub, "add");
+    const httpRequest = {
+      body: {
+        name: "Join to the 104th Training Corps",
+        responsible: "Eren",
+        deadLine: "13/01/2023",
+        projectId: "awesome-id",
+      },
+    };
+
+    await sut.handle(httpRequest);
+
+    expect(addSpy).toHaveBeenCalledTimes(1);
+    expect(addSpy).toHaveBeenCalledWith({
+      name: "Join to the 104th Training Corps",
+      responsible: "Eren",
+      deadLine: new Date("2023-1-13"),
+      projectId: "awesome-id",
+    });
   });
 });
