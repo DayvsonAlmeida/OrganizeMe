@@ -6,13 +6,18 @@ export const badRequest = (error: Error): Http.Response<Error> => ({
   body: error,
 });
 
+export const unauthorized = (error: Error): Http.Response<Error> => ({
+  statusCode: 401,
+  body: error,
+});
+
 export const forbidden = (error: Error): Http.Response<Error> => ({
   statusCode: 403,
   body: error,
 });
 
-export const unauthorized = (error: Error): Http.Response<Error> => ({
-  statusCode: 401,
+export const notFound = (error: Error): Http.Response<Error> => ({
+  statusCode: 404,
   body: error,
 });
 
