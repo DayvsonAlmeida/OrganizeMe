@@ -1,5 +1,9 @@
 import { CreateTaskController } from "./create-task.controller";
-import { MissingParamError, DeadLineValidator } from "./create-task.protocols";
+import {
+  MissingParamError,
+  DeadLineValidator,
+  InvalidParamError,
+} from "./create-task.protocols";
 
 const makeDeadLineValidator = (): DeadLineValidator => {
   class DeadLineValidatorStub implements DeadLineValidator {
@@ -109,5 +113,25 @@ describe("CreateTask Controller", () => {
 
     expect(isValidSpy).toHaveBeenCalledTimes(1);
     expect(isValidSpy).toHaveBeenCalledWith("13/01/2023");
+  });
+
+  it("should return 400 if invalid deadLineValidator is provided", async () => {
+    const { sut, deadLineValidatorStub } = makeSut();
+    const httpRequest = {
+      body: {
+        name: "Join to the 104th Training Corps",
+        responsible: "Eren",
+        deadLine: "13/01/2023",
+        projectId: "awesome-id",
+      },
+    };
+    jest
+      .spyOn(deadLineValidatorStub, "isValid")
+      .mockImplementationOnce(() => false);
+
+    const httpResponse = await sut.handle(httpRequest);
+
+    expect(httpResponse.statusCode).toBe(400);
+    expect(httpResponse.body).toEqual(new InvalidParamError("deadLine"));
   });
 });
