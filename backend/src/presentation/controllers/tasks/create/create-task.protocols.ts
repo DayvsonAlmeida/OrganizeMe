@@ -1,12 +1,6 @@
-export { badRequest, ok, serverError, notFound } from "../../../helpers";
-export { Controller, Http, DeadLineValidator } from "../../../protocols";
-export { Task } from "../../../../domain/entities/task";
-export {
-  MissingParamError,
-  InvalidParamError,
-  NotFoundError,
-} from "../../../errors";
-export {
-  FindProject,
-  FindProjectInput,
-} from "../../../../domain/usecases/project/find-project";
+export * from "../../../errors";
+export * from "../../../helpers";
+export * from "../../../protocols";
+export * from "../../../../domain/entities/task";
+export * from "../../../../domain/usecases/tasks/add-task";
+export * from "../../../../domain/usecases/project/find-project";
