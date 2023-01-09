@@ -1,4 +1,4 @@
-export { badRequest, serverError } from "../../helpers";
+export { badRequest, serverError, ok } from "../../helpers";
 export { MissingParamError, ServerError } from "../../errors";
 export { Controller, Http } from "../../protocols";
 export { Project } from "../../../domain/entities/project";

@@ -2,6 +2,7 @@ import {
   AddProject,
   badRequest,
   serverError,
+  ok,
   Controller,
   Http,
   MissingParamError,
@@ -24,12 +25,9 @@ export class CreateProjectController implements Controller<CreateProjectInput> {
     if (missingField) return badRequest(new MissingParamError("name"));
 
     try {
-      await this.addProject.add({ name: body.name });
+      const project = await this.addProject.add({ name: body.name });
 
-      return {
-        statusCode: 200,
-        body: {},
-      };
+      return ok(project);
     } catch {
       return serverError();
     }
