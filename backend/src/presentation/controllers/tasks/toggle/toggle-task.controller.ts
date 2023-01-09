@@ -26,8 +26,11 @@ export class ToggleTaskController implements Controller<ToggleTaskInput> {
     if (isMissingField) return badRequest(new MissingParamError("done"));
 
     try {
-      await this.toggleTask.toggle({ id: params.id, done: body.done });
-      return ok({});
+      const task = await this.toggleTask.toggle({
+        id: params.id,
+        done: body.done,
+      });
+      return ok(task);
     } catch {
       return serverError();
     }
