@@ -1,13 +1,26 @@
 import { CreateTaskController } from "./create-task.controller";
-import { MissingParamError } from "./create-task.protocols";
+import { MissingParamError, DeadLineValidator } from "./create-task.protocols";
+
+const makeDeadLineValidator = (): DeadLineValidator => {
+  class DeadLineValidatorStub implements DeadLineValidator {
+    isValid(deadLine: string): boolean {
+      return true;
+    }
+  }
+
+  return new DeadLineValidatorStub();
+};
 
 type SutTypes = {
   sut: CreateTaskController;
+  deadLineValidatorStub: DeadLineValidator;
 };
 
 const makeSut = (): SutTypes => {
+  const deadLineValidatorStub = makeDeadLineValidator();
   return {
-    sut: new CreateTaskController(),
+    deadLineValidatorStub,
+    sut: new CreateTaskController(deadLineValidatorStub),
   };
 };
 
@@ -78,5 +91,23 @@ describe("CreateTask Controller", () => {
 
     expect(httpResponse.statusCode).toBe(400);
     expect(httpResponse.body).toEqual(new MissingParamError("projectId"));
+  });
+
+  it("should call deadLineValidator with correct values", async () => {
+    const { sut, deadLineValidatorStub } = makeSut();
+    const isValidSpy = jest.spyOn(deadLineValidatorStub, "isValid");
+    const httpRequest = {
+      body: {
+        name: "Join to the 104th Training Corps",
+        responsible: "Eren",
+        deadLine: "13/01/2023",
+        projectId: "awesome-id",
+      },
+    };
+
+    await sut.handle(httpRequest);
+
+    expect(isValidSpy).toHaveBeenCalledTimes(1);
+    expect(isValidSpy).toHaveBeenCalledWith("13/01/2023");
   });
 });
