@@ -6,6 +6,6 @@ export namespace Http {
 
   export type Response<T = unknown> = {
     statusCode: number;
-    body: T;
+    body: T | Error;
   };
 }

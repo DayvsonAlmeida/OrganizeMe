@@ -12,7 +12,7 @@ const makeAddProject = (): AddProject => {
     add(project: AddProjectInput): Promise<Project> {
       const result: Project = {
         id: "awesome-id",
-        name: "My Project",
+        name: project.name,
       };
       return new Promise((resolve) => resolve(result));
     }
@@ -61,6 +61,7 @@ describe("CreateProject Controller", () => {
 
     await sut.handle(httpRequest);
 
+    expect(addSpy).toBeCalledTimes(1);
     expect(addSpy).toHaveBeenCalledWith({ name: "My Project" });
   });
 
@@ -76,5 +77,21 @@ describe("CreateProject Controller", () => {
 
     expect(httpResponse.statusCode).toBe(500);
     expect(httpResponse.body).toEqual(new ServerError());
+  });
+
+  it("should return 200", async () => {
+    const { sut, addProjectStub } = makeSut();
+    const addSpy = jest.spyOn(addProjectStub, "add");
+    const httpRequest = { body: { name: "My Project" } };
+
+    const httpResponse = await sut.handle(httpRequest);
+
+    expect(addSpy).toHaveBeenCalledTimes(1);
+    expect(addSpy).toHaveBeenCalledWith({ name: "My Project" });
+    expect(httpResponse.statusCode).toBe(200);
+    expect(httpResponse.body).toEqual({
+      id: "awesome-id",
+      name: "My Project",
+    });
   });
 });

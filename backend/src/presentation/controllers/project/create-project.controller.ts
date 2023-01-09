@@ -6,6 +6,7 @@ import {
   Controller,
   Http,
   MissingParamError,
+  Project,
 } from "./create-project.protocols";
 
 type CreateProjectInput = {
@@ -13,7 +14,7 @@ type CreateProjectInput = {
 };
 
 export type Request = Http.Request<CreateProjectInput>;
-type Response = Http.Response<any>;
+type Response = Http.Response<Project>;
 
 export class CreateProjectController implements Controller<CreateProjectInput> {
   constructor(private readonly addProject: AddProject) {}
