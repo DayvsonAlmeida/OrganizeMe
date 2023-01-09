@@ -1,12 +1,14 @@
 import {
-  badRequest,
-  ok,
   Controller,
   Http,
+  badRequest,
+  ok,
+  serverError,
   MissingParamError,
-  Task,
-  DeadLineValidator,
   InvalidParamError,
+  Task,
+  FindProject,
+  DeadLineValidator,
 } from "./create-task.protocols";
 
 type CreateTaskInput = {
@@ -20,7 +22,10 @@ type Request = Http.Request<CreateTaskInput>;
 type Response = Http.Response<Task>;
 
 export class CreateTaskController implements Controller<CreateTaskInput, Task> {
-  constructor(private readonly deadLineValidator: DeadLineValidator) {}
+  constructor(
+    private readonly deadLineValidator: DeadLineValidator,
+    private readonly findProject: FindProject
+  ) {}
 
   async handle(request: Request): Promise<Response> {
     const { body } = request;
@@ -36,10 +41,18 @@ export class CreateTaskController implements Controller<CreateTaskInput, Task> {
 
     if (missingParam) return badRequest(new MissingParamError(missingParam));
 
-    const isValidDeadLine = this.deadLineValidator.isValid(body.deadLine);
+    const { deadLine, projectId } = body;
+
+    const isValidDeadLine = this.deadLineValidator.isValid(deadLine);
 
     if (!isValidDeadLine) return badRequest(new InvalidParamError("deadLine"));
 
-    return ok({});
+    try {
+      const project = await this.findProject.find({ id: projectId });
+
+      return ok({});
+    } catch {
+      return serverError();
+    }
   }
 }
