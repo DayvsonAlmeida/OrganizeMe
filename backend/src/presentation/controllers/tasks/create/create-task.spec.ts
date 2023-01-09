@@ -272,4 +272,27 @@ describe("CreateTask Controller", () => {
       projectId: "awesome-id",
     });
   });
+
+  it("should return 500 if addTask throws", async () => {
+    const { sut, addTaskStub } = makeSut();
+    const httpRequest = {
+      body: {
+        name: "Join to the 104th Training Corps",
+        responsible: "Eren",
+        deadLine: "13/01/2023",
+        projectId: "awesome-id",
+      },
+    };
+
+    jest
+      .spyOn(addTaskStub, "add")
+      .mockImplementationOnce(
+        () => new Promise((_, reject) => reject(new Error()))
+      );
+
+    const httpResponse = await sut.handle(httpRequest);
+
+    expect(httpResponse.statusCode).toBe(500);
+    expect(httpResponse.body).toEqual(new ServerError());
+  });
 });
