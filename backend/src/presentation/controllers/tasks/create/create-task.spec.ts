@@ -38,17 +38,13 @@ const makeFindProject = (): FindProject => {
 
 const makeAddTask = (): AddTask => {
   class AddTaskStub implements AddTask {
-    async add({
-      deadLine,
-      name,
-      responsible,
-      projectId,
-    }: AddTaskInput): Promise<Task> {
+    async add({ deadLine, name, responsible }: AddTaskInput): Promise<Task> {
       return {
         id: "awesome-task-id",
         deadLine,
         name,
         responsible,
+        done: false,
       };
     }
   }
@@ -315,6 +311,7 @@ describe("CreateTask Controller", () => {
       responsible: "Eren",
       deadLine: new Date("2023-1-13"),
       id: "awesome-task-id",
+      done: false,
     });
   });
 });
