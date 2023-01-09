@@ -9,6 +9,8 @@ import {
   Task,
   FindProject,
   DeadLineValidator,
+  notFound,
+  NotFoundError,
 } from "./create-task.protocols";
 
 type CreateTaskInput = {
@@ -49,6 +51,8 @@ export class CreateTaskController implements Controller<CreateTaskInput, Task> {
 
     try {
       const project = await this.findProject.find({ id: projectId });
+
+      if (!project) return notFound(new NotFoundError("project"));
 
       return ok({});
     } catch {

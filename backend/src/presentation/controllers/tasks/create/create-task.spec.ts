@@ -3,6 +3,7 @@ import { CreateTaskController } from "./create-task.controller";
 import {
   MissingParamError,
   InvalidParamError,
+  NotFoundError,
   DeadLineValidator,
   FindProject,
   FindProjectInput,
@@ -172,5 +173,26 @@ describe("CreateTask Controller", () => {
 
     expect(findSpy).toHaveBeenCalledTimes(1);
     expect(findSpy).toHaveBeenCalledWith({ id: "awesome-id" });
+  });
+
+  it("should return 404 if a nonexistent projectId is provided", async () => {
+    const { sut, findProjectStub } = makeSut();
+    const httpRequest = {
+      body: {
+        name: "Join to the 104th Training Corps",
+        responsible: "Eren",
+        deadLine: "13/01/2023",
+        projectId: "awesome-id",
+      },
+    };
+
+    jest
+      .spyOn(findProjectStub, "find")
+      .mockImplementationOnce(async () => null);
+
+    const httpResponse = await sut.handle(httpRequest);
+
+    expect(httpResponse.statusCode).toBe(404);
+    expect(httpResponse.body).toEqual(new NotFoundError("project"));
   });
 });
