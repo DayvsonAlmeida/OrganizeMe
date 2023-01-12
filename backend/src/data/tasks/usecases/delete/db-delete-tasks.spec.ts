@@ -9,7 +9,7 @@ type SutTypes = {
 
 const makeDeleteTasksRepository = (): DeleteTasksRepository => {
   class DeleteTasksRepositoryStub implements DeleteTasksRepository {
-    delete(project: DeleteTaskInput): Promise<void> {
+    delete(task: DeleteTaskInput): Promise<void> {
       return new Promise((resolve) => resolve());
     }
   }
