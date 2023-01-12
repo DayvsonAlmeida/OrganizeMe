@@ -1,9 +1,9 @@
 import { Express, Router } from "express";
-import { useProjectRoutes } from "../routes/project";
+import { setupProjectRoutes } from "../routes/project.routes";
 
 export function setupRoutes(app: Express): void {
   const router = Router();
 
   app.use("/api", router);
-  useProjectRoutes(router);
+  setupProjectRoutes(router);
 }
