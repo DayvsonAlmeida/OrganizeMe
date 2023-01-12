@@ -1,10 +1,14 @@
 import { Task } from "@/domain/entities/task";
 import { AddTaskInput } from "@/domain/usecases/tasks/add-task";
 import { AddTasksRepository } from "@/data/tasks/protocols/add-tasks.repository";
+import { DeleteTasksRepository } from "@/data/tasks/protocols/delete-tasks.repository";
 
 import { db, TaskInMemoryDB } from "../db";
+import { DeleteTaskInput } from "@/domain/usecases/tasks/delete-task";
 
-export class TasksInMemoryRepositoryAdapter implements AddTasksRepository {
+export class TasksInMemoryRepositoryAdapter
+  implements AddTasksRepository, DeleteTasksRepository
+{
   async add({
     deadLine,
     name,
@@ -35,5 +39,12 @@ export class TasksInMemoryRepositoryAdapter implements AddTasksRepository {
       responsible,
       done: false,
     };
+  }
+
+  async delete(task: DeleteTaskInput): Promise<void> {
+    const [projectId, taskId] = task.id.split("-").map((id) => parseInt(id));
+    const project = db.at(projectId - 1);
+
+    delete project?.tasks[taskId];
   }
 }
