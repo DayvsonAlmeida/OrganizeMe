@@ -29,5 +29,7 @@ export class ProjectInMemoryRepositoryAdapter
     const hasProject = db[idx];
 
     if (!hasProject) throw new Error();
+
+    delete db[idx];
   }
 }
