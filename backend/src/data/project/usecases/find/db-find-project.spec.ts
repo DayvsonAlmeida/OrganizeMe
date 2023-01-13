@@ -11,7 +11,11 @@ type SutTypes = {
 const makeFindProjectRepository = (): FindProjectRepository => {
   class FindProjectRepositoryStub implements FindProjectRepository {
     find(project: FindProjectInput): Promise<Project | null> {
-      const fakeProject = { id: project.id, name: "My Project" };
+      const fakeProject: Project = {
+        id: project.id,
+        name: "My Project",
+        tasks: [],
+      };
 
       return new Promise((resolve) => resolve(fakeProject));
     }
@@ -78,6 +82,7 @@ describe("DbFindProject Usecase", () => {
     expect(project).toEqual({
       id: "awesome-id",
       name: "My Project",
+      tasks: [],
     });
   });
 });

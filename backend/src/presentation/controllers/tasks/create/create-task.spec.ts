@@ -29,6 +29,7 @@ const makeFindProject = (): FindProject => {
       return {
         id,
         name: "Awesome Project",
+        tasks: [],
       };
     }
   }

@@ -13,6 +13,7 @@ const makeAddProject = (): AddProject => {
       const result: Project = {
         id: "awesome-id",
         name: project.name,
+        tasks: [],
       };
       return new Promise((resolve) => resolve(result));
     }
@@ -92,6 +93,7 @@ describe("CreateProject Controller", () => {
     expect(httpResponse.body).toEqual({
       id: "awesome-id",
       name: "My Project",
+      tasks: [],
     });
   });
 });

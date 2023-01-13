@@ -11,9 +11,10 @@ type SutTypes = {
 const makeAddProjectRepository = (): AddProjectRepository => {
   class AddProjectRepositoryStub implements AddProjectRepository {
     add(project: AddProjectInput): Promise<Project> {
-      const fakeProject = {
+      const fakeProject: Project = {
         id: "awesome-id",
         name: project.name,
+        tasks: [],
       };
 
       return new Promise((resolve) => resolve(fakeProject));
@@ -68,6 +69,7 @@ describe("DbAddProject Usecase", () => {
     expect(project).toEqual({
       id: "awesome-id",
       name: "My Project",
+      tasks: [],
     });
   });
 });
