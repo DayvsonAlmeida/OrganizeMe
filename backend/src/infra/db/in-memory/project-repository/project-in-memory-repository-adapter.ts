@@ -1,18 +1,20 @@
 import { Project } from "@/domain/entities/project";
 import { AddProjectInput } from "@/domain/usecases/project/add-project";
+import { FindProjectInput } from "@/domain/usecases/project/find-project";
 import { DeleteProjectInput } from "@/domain/usecases/project/delete-project";
 import { AddProjectRepository } from "@/data/project/protocols/add-project.repository";
-import { DeleteProjectRepository } from "@/data/project/protocols/delete-project.repository";
 import { FindProjectRepository } from "@/data/project/protocols/find-project.repository";
+import { ListProjectRepository } from "@/data/project/protocols/list-project.repository";
+import { DeleteProjectRepository } from "@/data/project/protocols/delete-project.repository";
 
 import { db, ProjectInMemoryDB } from "../db";
-import { FindProjectInput } from "@/domain/usecases/project/find-project";
 
 export class ProjectInMemoryRepositoryAdapter
   implements
     AddProjectRepository,
     DeleteProjectRepository,
-    FindProjectRepository
+    FindProjectRepository,
+    ListProjectRepository
 {
   async add(project: AddProjectInput): Promise<Project> {
     const inMemoryProject: ProjectInMemoryDB = {
@@ -39,5 +41,17 @@ export class ProjectInMemoryRepositoryAdapter
     if (!inMemoryProject) return null;
 
     return { id, ...inMemoryProject };
+  }
+
+  async list(): Promise<Project[]> {
+    return db.map(this.toProject);
+  }
+
+  toProject(project: ProjectInMemoryDB, index: number): Project {
+    return {
+      id: `${index + 1}`,
+      name: project.name,
+      tasks: project.tasks,
+    };
   }
 }
