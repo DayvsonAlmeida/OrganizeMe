@@ -1,12 +1,15 @@
 import { useState } from "react";
-import { useLocation } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import { Card, Typography, Divider, Button, List, Modal } from "antd";
 import { CheckOutlined, DeleteOutlined, UndoOutlined } from "@ant-design/icons";
 
 import { Project, Task } from "../../contexts/projects";
+import { useProjects } from "../../hooks/projects";
 
 export function DetailsProjectPage() {
+  const navigate = useNavigate();
   const location = useLocation();
+  const { removeProject } = useProjects();
 
   const [isModalOpen, setIsModalOpen] = useState(false);
 
@@ -23,8 +26,9 @@ export function DetailsProjectPage() {
   };
 
   const handleOk = () => {
-    console.log("Delete project", id);
-    setIsModalOpen(false);
+    removeProject(id)
+      .then(() => navigate("/"))
+      .finally(() => setIsModalOpen(false));
   };
 
   const handleCancel = () => {

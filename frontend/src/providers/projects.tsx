@@ -8,6 +8,7 @@ import {
   ToggleTaskInput,
 } from "../contexts/projects";
 import { createProject } from "../services/projects/create";
+import { deleteProject } from "../services/projects/delete";
 import { fetchProjects } from "../services/projects/list";
 
 interface ProjectsProviderProps {
@@ -24,7 +25,8 @@ export function ProjectsProvider({ children }: ProjectsProviderProps) {
   }, []);
 
   const removeProject = useCallback(async (id: string): Promise<void> => {
-    throw new Error("Not implemented method!");
+    await deleteProject({ id });
+    setProjects((prev) => prev.filter((project) => project.id !== id));
   }, []);
 
   const addTask = useCallback(async (data: AddTaskInput): Promise<Task> => {
