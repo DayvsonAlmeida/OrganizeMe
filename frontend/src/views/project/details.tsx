@@ -1,14 +1,19 @@
 import { useLocation } from "react-router-dom";
-import { CheckOutlined, DeleteOutlined } from "@ant-design/icons";
+import { CheckOutlined, DeleteOutlined, UndoOutlined } from "@ant-design/icons";
 import { Card, Typography, Divider, Button, List } from "antd";
 
-import { Project } from "../../contexts/projects";
+import { Project, Task } from "../../contexts/projects";
+import { useState } from "react";
 
 export function DetailsProjectPage() {
   const location = useLocation();
   const { id, name, tasks } = location.state as Project;
   const totalOfTasks = tasks.length;
   const completedTasks = tasks.filter((t) => t.done).length;
+
+  const handleOnCompleteTask = (task: Task) => {
+    console.log({ task });
+  };
 
   return (
     <Card>
@@ -31,19 +36,45 @@ export function DetailsProjectPage() {
           size="small"
           bordered
           dataSource={tasks}
-          renderItem={(item) => {
-            const deadLine = new Date(item.deadLine).toLocaleDateString();
-            return (
-              <List.Item actions={[<CheckOutlined />, <DeleteOutlined />]}>
-                {item.name} | {item.responsible} | {deadLine}
-              </List.Item>
-            );
-          }}
+          renderItem={(item: Task) => (
+            <TaskItem task={item} onComplete={handleOnCompleteTask} />
+          )}
         />
         <Button type="primary" style={{ width: "fit-content", marginTop: 12 }}>
           Criar Tarefa
         </Button>
       </div>
     </Card>
+  );
+}
+
+interface TaskProps {
+  task: Task;
+  onComplete: (task: Task) => void;
+}
+
+function TaskItem({ task, onComplete }: TaskProps) {
+  const [done, setDone] = useState(task.done);
+  const deadLine = new Date(task.deadLine).toLocaleDateString();
+
+  const handleClickComplete = () => {
+    const newDoneValue = !done;
+
+    onComplete({ ...task, done: newDoneValue });
+    setDone(newDoneValue);
+  };
+
+  const DoneIcon = done ? (
+    <UndoOutlined onClick={handleClickComplete} />
+  ) : (
+    <CheckOutlined onClick={handleClickComplete} />
+  );
+
+  return (
+    <List.Item actions={[DoneIcon, <DeleteOutlined />]}>
+      <Typography.Text delete={done}>
+        {task.name} | {task.responsible} | {deadLine}
+      </Typography.Text>
+    </List.Item>
   );
 }
