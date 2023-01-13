@@ -1,4 +1,4 @@
-import { ReactNode, useCallback, useMemo, useState } from "react";
+import { ReactNode, useCallback, useEffect, useMemo, useState } from "react";
 import {
   AddTaskInput,
   Project,
@@ -7,13 +7,14 @@ import {
   Task,
   ToggleTaskInput,
 } from "../contexts/projects";
+import { fetchProjects } from "../services/projects/list";
 
 interface ProjectsProviderProps {
   children: ReactNode;
 }
 
 export function ProjectsProvider({ children }: ProjectsProviderProps) {
-  const [projects] = useState<Project[]>([]);
+  const [projects, setProjects] = useState<Project[]>([]);
 
   const addProject = useCallback(async (name: string): Promise<Project> => {
     throw new Error("Not implemented method!");
@@ -37,6 +38,10 @@ export function ProjectsProvider({ children }: ProjectsProviderProps) {
     },
     []
   );
+
+  useEffect(() => {
+    fetchProjects().then((data) => setProjects(data));
+  }, []);
 
   const value: ProjectsContextProps = useMemo(
     () => ({

@@ -1,8 +1,8 @@
+import { useMemo } from "react";
 import { Outlet } from "react-router-dom";
 import { Layout, Menu, MenuProps, Typography } from "antd";
 
 import { useProjects } from "../hooks/projects";
-import { useMemo } from "react";
 
 const { Content, Sider } = Layout;
 
