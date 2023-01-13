@@ -27,7 +27,7 @@ export function AppLayout() {
       <Sider>
         <NavLink to="/">
           <Typography.Title level={3} style={{ margin: 16, color: "#fff" }}>
-            OrgaizeMe
+            OrganizeMe
           </Typography.Title>
         </NavLink>
 
@@ -43,7 +43,14 @@ export function AppLayout() {
         </div>
       </Sider>
       <Layout className="site-layout">
-        <Content style={{ margin: "16px 16px 0" }}>
+        <Content
+          style={{
+            display: "flex",
+            margin: "16px 16px 0",
+            justifyContent: "center",
+            alignItems: "center",
+          }}
+        >
           <Outlet />
         </Content>
       </Layout>
