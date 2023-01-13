@@ -49,16 +49,19 @@ export function ProjectsProvider({ children }: ProjectsProviderProps) {
     [projects]
   );
 
-  const removeTask = useCallback(async (id: string): Promise<void> => {
-    await deleteTask({ id });
-    const [projectId] = id.split("-");
-    const project = projects.find((p) => p.id === projectId);
+  const removeTask = useCallback(
+    async (id: string): Promise<void> => {
+      await deleteTask({ id });
+      const [projectId] = id.split("-");
+      const project = projects.find((p) => p.id === projectId);
 
-    if (!project) return;
+      if (!project) return;
 
-    project.tasks = project.tasks.filter((t) => t.id !== id);
-    setProjects((prev) => prev.map((p) => (p.id === project.id ? project : p)));
-  }, []);
+      project.tasks = project.tasks.filter((t) => t.id !== id);
+      setProjects(projects.map((p) => (p.id === project.id ? project : p)));
+    },
+    [projects]
+  );
 
   const toggleTask = useCallback(
     async (data: ToggleTaskInput): Promise<Task> => {

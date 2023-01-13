@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { Card, Typography, Divider, Button, List, Modal } from "antd";
 import { CheckOutlined, DeleteOutlined, UndoOutlined } from "@ant-design/icons";
@@ -14,9 +14,12 @@ export function DetailsProjectPage() {
 
   const { id } = location.state as Project;
 
-  const currentProject = projects.find((p) => p.id === id) as Project;
+  const currentProject = useMemo(
+    () => projects.find((p) => p.id === id) as Project,
+    [projects, id]
+  );
 
-  const [taskId, setTaskId] = useState("");
+  const [taskIdToDelete, setTaskId] = useState("");
   const [isModalOpen, setIsModalOpen] = useState({
     project: false,
     task: false,
@@ -40,7 +43,7 @@ export function DetailsProjectPage() {
   };
 
   const handleDeleteTask = () => {
-    removeTask(taskId)
+    removeTask(taskIdToDelete)
       .then(() => {})
       .finally(() => handleCancel("task"));
   };
@@ -48,10 +51,6 @@ export function DetailsProjectPage() {
   const handleCancel = (key: "project" | "task") => {
     setIsModalOpen((prev) => ({ ...prev, [key]: false }));
   };
-
-  useEffect(() => {
-    console.log("MUDOU");
-  }, [projects]);
 
   return (
     <>
@@ -81,6 +80,7 @@ export function DetailsProjectPage() {
             dataSource={currentProject?.tasks}
             renderItem={(item: Task) => (
               <TaskItem
+                key={item.id}
                 task={item}
                 onComplete={handleOnCompleteTask}
                 onDelete={() => {
@@ -97,7 +97,7 @@ export function DetailsProjectPage() {
               addTask({
                 projectId: id,
                 deadLine: "15/01/2023",
-                name: "My Task",
+                name: currentProject.name,
                 responsible: "eu",
               })
             }
