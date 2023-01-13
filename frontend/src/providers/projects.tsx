@@ -10,6 +10,7 @@ import {
 import { createProject } from "../services/projects/create";
 import { deleteProject } from "../services/projects/delete";
 import { fetchProjects } from "../services/projects/list";
+import { deleteTask } from "../services/tasks/delete";
 import { toggleTask as toggle } from "../services/tasks/toggle";
 
 interface ProjectsProviderProps {
@@ -35,7 +36,14 @@ export function ProjectsProvider({ children }: ProjectsProviderProps) {
   }, []);
 
   const removeTask = useCallback(async (id: string): Promise<void> => {
-    throw new Error("Not implemented method!");
+    await deleteTask({ id });
+    const [projectId] = id.split("-");
+    const project = projects.find((p) => p.id === projectId);
+
+    if (!project) return;
+
+    project.tasks = project.tasks.filter((t) => t.id !== id);
+    setProjects((prev) => prev.map((p) => (p.id === project.id ? project : p)));
   }, []);
 
   const toggleTask = useCallback(

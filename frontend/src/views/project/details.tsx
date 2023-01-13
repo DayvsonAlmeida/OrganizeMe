@@ -9,31 +9,44 @@ import { useProjects } from "../../hooks/projects";
 export function DetailsProjectPage() {
   const navigate = useNavigate();
   const location = useLocation();
-  const { removeProject, toggleTask } = useProjects();
+  const { removeProject, toggleTask, removeTask, projects } = useProjects();
 
-  const [isModalOpen, setIsModalOpen] = useState(false);
+  const { id, name, tasks: projectTasks } = location.state as Project;
 
-  const { id, name, tasks } = location.state as Project;
+  const [taskId, setTaskId] = useState("");
+  const [tasks, setTasks] = useState(projectTasks);
+  const [isModalOpen, setIsModalOpen] = useState({
+    project: false,
+    task: false,
+  });
+
   const totalOfTasks = tasks.length;
   const completedTasks = tasks.filter((t) => t.done).length;
 
   const handleOnCompleteTask = (task: Task) => {
     toggleTask({ id: task.id, done: task.done });
-    console.log({ task });
   };
 
-  const showModal = () => {
-    setIsModalOpen(true);
+  const showModal = (key: "project" | "task") => {
+    setIsModalOpen((prev) => ({ ...prev, [key]: true }));
   };
 
-  const handleOk = () => {
+  const handleDeleteProject = () => {
     removeProject(id)
       .then(() => navigate("/"))
-      .finally(() => setIsModalOpen(false));
+      .finally(() => setIsModalOpen((prev) => ({ ...prev, project: false })));
   };
 
-  const handleCancel = () => {
-    setIsModalOpen(false);
+  const handleDeleteTask = () => {
+    removeTask(taskId)
+      .then(() => {
+        setTasks((prev) => prev.filter((t) => t.id !== taskId));
+      })
+      .finally(() => handleCancel("task"));
+  };
+
+  const handleCancel = (key: "project" | "task") => {
+    setIsModalOpen((prev) => ({ ...prev, [key]: false }));
   };
 
   return (
@@ -50,7 +63,7 @@ export function DetailsProjectPage() {
             }}
           >
             <Typography.Title level={4}>{name}</Typography.Title>
-            <DeleteOutlined onClick={showModal} />
+            <DeleteOutlined onClick={() => showModal("project")} />
           </div>
           <Typography.Text
             style={{}}
@@ -61,7 +74,14 @@ export function DetailsProjectPage() {
             bordered
             dataSource={tasks}
             renderItem={(item: Task) => (
-              <TaskItem task={item} onComplete={handleOnCompleteTask} />
+              <TaskItem
+                task={item}
+                onComplete={handleOnCompleteTask}
+                onDelete={() => {
+                  showModal("task");
+                  setTaskId(item.id);
+                }}
+              />
             )}
           />
           <Button
@@ -76,14 +96,29 @@ export function DetailsProjectPage() {
       <Modal
         title="Deseja excluir o projeto?"
         centered
-        open={isModalOpen}
-        onOk={handleOk}
-        onCancel={handleCancel}
+        open={isModalOpen.project}
+        onOk={handleDeleteProject}
+        onCancel={() => handleCancel("project")}
         footer={[
-          <Button key="back" onClick={handleCancel}>
+          <Button key="back" onClick={() => handleCancel("project")}>
             Cancelar
           </Button>,
-          <Button key="submit" type="primary" onClick={handleOk}>
+          <Button key="submit" type="primary" onClick={handleDeleteProject}>
+            Sim
+          </Button>,
+        ]}
+      />
+      <Modal
+        title="Deseja excluir a tarefa?"
+        centered
+        open={isModalOpen.task}
+        onOk={handleDeleteTask}
+        onCancel={() => handleCancel("task")}
+        footer={[
+          <Button key="back" onClick={() => handleCancel("task")}>
+            Cancelar
+          </Button>,
+          <Button key="submit" type="primary" onClick={handleDeleteTask}>
             Sim
           </Button>,
         ]}
@@ -95,9 +130,10 @@ export function DetailsProjectPage() {
 interface TaskProps {
   task: Task;
   onComplete: (task: Task) => void;
+  onDelete: (task: Task) => void;
 }
 
-function TaskItem({ task, onComplete }: TaskProps) {
+function TaskItem({ task, onComplete, onDelete }: TaskProps) {
   const [done, setDone] = useState(task.done);
   const deadLine = new Date(task.deadLine).toLocaleDateString();
 
@@ -115,7 +151,9 @@ function TaskItem({ task, onComplete }: TaskProps) {
   );
 
   return (
-    <List.Item actions={[DoneIcon, <DeleteOutlined />]}>
+    <List.Item
+      actions={[DoneIcon, <DeleteOutlined onClick={() => onDelete(task)} />]}
+    >
       <Typography.Text delete={done}>
         {task.name} | {task.responsible} | {deadLine}
       </Typography.Text>
