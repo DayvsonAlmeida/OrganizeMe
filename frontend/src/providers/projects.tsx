@@ -74,14 +74,12 @@ export function ProjectsProvider({ children }: ProjectsProviderProps) {
           t.id === toggledTask.id ? toggledTask : t
         );
 
-        setProjects((prev) =>
-          prev.map((p) => (p.id === project.id ? project : p))
-        );
+        setProjects(projects.map((p) => (p.id === project.id ? project : p)));
       }
 
       return toggledTask;
     },
-    []
+    [projects]
   );
 
   useEffect(() => {
