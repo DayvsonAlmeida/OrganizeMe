@@ -1,6 +1,9 @@
 import { Outlet } from "react-router-dom";
 import { Layout, Menu, MenuProps, Typography } from "antd";
 
+import { useProjects } from "../hooks/projects";
+import { useMemo } from "react";
+
 const { Content, Sider } = Layout;
 
 type MenuItem = Required<MenuProps>["items"][number];
@@ -12,9 +15,13 @@ function getItem(label: React.ReactNode, key: React.Key): MenuItem {
   } as MenuItem;
 }
 
-const items: MenuItem[] = [getItem("Option 1", "1")];
-
 export function AppLayout() {
+  const { projects } = useProjects();
+  const items: MenuItem[] = useMemo(
+    () => projects.map((project) => getItem(project.name, project.id)),
+    [projects]
+  );
+
   return (
     <Layout style={{ minHeight: "100vh" }}>
       <Sider>
