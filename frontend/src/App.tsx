@@ -1,11 +1,15 @@
 import { unstable_HistoryRouter as HistoryRouter } from "react-router-dom";
-import { AppRoutes } from "./routes/app.routes";
+
 import { history } from "./history";
+import { AppRoutes } from "./routes/app.routes";
+import { ProjectsProvider } from "./providers/projects";
 
 function App() {
   return (
     <HistoryRouter history={history}>
-      <AppRoutes />
+      <ProjectsProvider>
+        <AppRoutes />
+      </ProjectsProvider>
     </HistoryRouter>
   );
 }
