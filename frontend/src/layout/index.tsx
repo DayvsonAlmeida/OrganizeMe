@@ -1,6 +1,6 @@
 import { useMemo } from "react";
-import { Outlet, NavLink } from "react-router-dom";
-import { Layout, Menu, MenuProps, Typography, Anchor } from "antd";
+import { Outlet, NavLink, useNavigate } from "react-router-dom";
+import { Layout, Menu, MenuProps, Typography } from "antd";
 
 import { useProjects } from "../hooks/projects";
 
@@ -16,11 +16,20 @@ function getItem(label: React.ReactNode, key: React.Key): MenuItem {
 }
 
 export function AppLayout() {
+  const navigate = useNavigate();
   const { projects } = useProjects();
   const items: MenuItem[] = useMemo(
     () => projects.map((project) => getItem(project.name, project.id)),
     [projects]
   );
+
+  const handleClick = (id: string) => {
+    const project = projects.find((p) => p.id === id);
+
+    if (!project) return;
+
+    navigate(`/project/${project.id}`, { state: project });
+  };
 
   return (
     <Layout style={{ minHeight: "100vh" }}>
@@ -33,9 +42,10 @@ export function AppLayout() {
 
         <Menu
           theme="dark"
-          defaultSelectedKeys={["1"]}
+          defaultSelectedKeys={[]}
           mode="inline"
           items={items}
+          onClick={(e) => handleClick(e.key)}
         />
 
         <div style={{ padding: 16 }}>
