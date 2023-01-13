@@ -1,10 +1,13 @@
-import { Button, Card, Form, Input, Typography } from "antd";
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
+import { Button, Card, Form, Input, Typography } from "antd";
 import { useProjects } from "../../hooks/projects";
 
 export function NewProjectPage() {
-  const [loading, setLoading] = useState(false);
+  const navigate = useNavigate();
   const { addProject } = useProjects();
+
+  const [loading, setLoading] = useState(false);
 
   const stopLoading = () => setLoading(false);
   const startLoading = () => setLoading(true);
@@ -12,7 +15,7 @@ export function NewProjectPage() {
   const onFinish = (values: any) => {
     startLoading();
     addProject(values.name)
-      .then(() => console.log("Projeto Criado"))
+      .then((data) => navigate(`/project/${data.id}`, { state: data }))
       .finally(() => stopLoading());
   };
 
