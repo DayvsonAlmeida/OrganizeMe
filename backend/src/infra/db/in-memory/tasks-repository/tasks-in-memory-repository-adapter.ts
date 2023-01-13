@@ -1,13 +1,15 @@
 import { Task } from "@/domain/entities/task";
 import { AddTaskInput } from "@/domain/usecases/tasks/add-task";
+import { DeleteTaskInput } from "@/domain/usecases/tasks/delete-task";
+import { ToggleTaskInput } from "@/domain/usecases/tasks/toggle-task";
 import { AddTasksRepository } from "@/data/tasks/protocols/add-tasks.repository";
 import { DeleteTasksRepository } from "@/data/tasks/protocols/delete-tasks.repository";
+import { ToggleTasksRepository } from "@/data/tasks/protocols/toggle-tasks.repository";
 
 import { db, TaskInMemoryDB } from "../db";
-import { DeleteTaskInput } from "@/domain/usecases/tasks/delete-task";
 
 export class TasksInMemoryRepositoryAdapter
-  implements AddTasksRepository, DeleteTasksRepository
+  implements AddTasksRepository, DeleteTasksRepository, ToggleTasksRepository
 {
   async add({
     deadLine,
@@ -46,5 +48,18 @@ export class TasksInMemoryRepositoryAdapter
     const project = db.at(projectId - 1);
 
     delete project?.tasks[taskId];
+  }
+
+  async toggle(task: ToggleTaskInput): Promise<Task> {
+    const [projectId, taskId] = task.id.split("-").map((id) => parseInt(id));
+    const project = db.at(projectId - 1);
+
+    const inMemoryTask = project?.tasks.at(taskId);
+
+    if (!inMemoryTask) throw new Error(`There is not task with id: ${task.id}`);
+
+    inMemoryTask.done = task.done;
+
+    return inMemoryTask;
   }
 }
