@@ -1,6 +1,6 @@
 import { useMemo } from "react";
-import { Outlet } from "react-router-dom";
-import { Layout, Menu, MenuProps, Typography } from "antd";
+import { Outlet, NavLink } from "react-router-dom";
+import { Layout, Menu, MenuProps, Typography, Anchor } from "antd";
 
 import { useProjects } from "../hooks/projects";
 
@@ -25,9 +25,11 @@ export function AppLayout() {
   return (
     <Layout style={{ minHeight: "100vh" }}>
       <Sider>
-        <Typography.Title level={3} style={{ margin: 16, color: "#fff" }}>
-          OrgaizeMe
-        </Typography.Title>
+        <NavLink to="/">
+          <Typography.Title level={3} style={{ margin: 16, color: "#fff" }}>
+            OrgaizeMe
+          </Typography.Title>
+        </NavLink>
 
         <Menu
           theme="dark"
@@ -35,6 +37,10 @@ export function AppLayout() {
           mode="inline"
           items={items}
         />
+
+        <div style={{ padding: 16 }}>
+          <NavLink to="project/new">+ Criar Projeto</NavLink>
+        </div>
       </Sider>
       <Layout className="site-layout">
         <Content style={{ margin: "16px 16px 0" }}>

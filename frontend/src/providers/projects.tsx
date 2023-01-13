@@ -40,7 +40,9 @@ export function ProjectsProvider({ children }: ProjectsProviderProps) {
   );
 
   useEffect(() => {
-    fetchProjects().then((data) => setProjects(data));
+    fetchProjects().then((data) => {
+      setProjects(data);
+    });
   }, []);
 
   const value: ProjectsContextProps = useMemo(
