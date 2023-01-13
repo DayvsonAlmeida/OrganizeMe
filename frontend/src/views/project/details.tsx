@@ -1,9 +1,20 @@
-import { useEffect, useMemo, useState } from "react";
+import { useMemo, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
-import { Card, Typography, Divider, Button, List, Modal } from "antd";
+import {
+  Card,
+  Typography,
+  Divider,
+  Button,
+  List,
+  Modal,
+  Form,
+  Input,
+  DatePicker,
+  DatePickerProps,
+} from "antd";
 import { CheckOutlined, DeleteOutlined, UndoOutlined } from "@ant-design/icons";
 
-import { Project, Task } from "../../contexts/projects";
+import { AddTaskInput, Project, Task } from "../../contexts/projects";
 import { useProjects } from "../../hooks/projects";
 
 export function DetailsProjectPage() {
@@ -23,6 +34,7 @@ export function DetailsProjectPage() {
   const [isModalOpen, setIsModalOpen] = useState({
     project: false,
     task: false,
+    create: true,
   });
 
   const totalOfTasks = currentProject?.tasks.length;
@@ -32,7 +44,7 @@ export function DetailsProjectPage() {
     toggleTask({ id: task.id, done: task.done });
   };
 
-  const showModal = (key: "project" | "task") => {
+  const showModal = (key: "project" | "task" | "create") => {
     setIsModalOpen((prev) => ({ ...prev, [key]: true }));
   };
 
@@ -43,13 +55,15 @@ export function DetailsProjectPage() {
   };
 
   const handleDeleteTask = () => {
-    removeTask(taskIdToDelete)
-      .then(() => {})
-      .finally(() => handleCancel("task"));
+    removeTask(taskIdToDelete).finally(() => handleCancel("task"));
   };
 
-  const handleCancel = (key: "project" | "task") => {
+  const handleCancel = (key: "project" | "task" | "create") => {
     setIsModalOpen((prev) => ({ ...prev, [key]: false }));
+  };
+
+  const handleSubmitTask = (task: Omit<AddTaskInput, "projectId">) => {
+    addTask({ ...task, projectId: id }).finally(() => handleCancel("create"));
   };
 
   return (
@@ -93,14 +107,7 @@ export function DetailsProjectPage() {
           <Button
             type="primary"
             style={{ width: "fit-content", marginTop: 12 }}
-            onClick={() =>
-              addTask({
-                projectId: id,
-                deadLine: "15/01/2023",
-                name: currentProject.name,
-                responsible: "eu",
-              })
-            }
+            onClick={() => showModal("create")}
           >
             Criar Tarefa
           </Button>
@@ -137,6 +144,16 @@ export function DetailsProjectPage() {
           </Button>,
         ]}
       />
+
+      <Modal
+        title="Adicionar Tarefa"
+        open={isModalOpen.create}
+        onCancel={() => handleCancel("create")}
+        footer={null}
+        centered
+      >
+        <CreateTask onSubmit={handleSubmitTask} />
+      </Modal>
     </>
   );
 }
@@ -172,5 +189,69 @@ function TaskItem({ task, onComplete, onDelete }: TaskProps) {
         {task.name} | {task.responsible} | {deadLine}
       </Typography.Text>
     </List.Item>
+  );
+}
+
+interface CreateTaskProps {
+  onSubmit: (task: Omit<AddTaskInput, "projectId">) => void;
+}
+
+function CreateTask({ onSubmit }: CreateTaskProps) {
+  const [date, setDate] = useState("");
+
+  const onFinish = (values: any) => {
+    onSubmit({ ...values, deadLine: new Date(date).toLocaleDateString() });
+  };
+
+  const onChange: DatePickerProps["onChange"] = (_, dateString) => {
+    setDate(dateString);
+  };
+
+  return (
+    <Form onFinish={onFinish} layout="vertical">
+      <Form.Item
+        label="Título"
+        name="name"
+        rules={[
+          {
+            required: true,
+            message: "Por favor, insira um nome para a tarefa!",
+          },
+        ]}
+      >
+        <Input placeholder="Título da tarefa" />
+      </Form.Item>
+      <Form.Item
+        label="Responsável"
+        name="responsible"
+        rules={[
+          {
+            required: true,
+            message: "Por favor, insira um responsável!",
+          },
+        ]}
+      >
+        <Input placeholder="Título da tarefa" />
+      </Form.Item>
+
+      <Form.Item
+        label="Prazo"
+        name="deadLine"
+        rules={[
+          {
+            required: true,
+            message: "Por favor, insira um um prazo para conclusão da tarefa!",
+          },
+        ]}
+      >
+        <DatePicker onChange={onChange} />
+      </Form.Item>
+
+      <Form.Item style={{ display: "flex", justifyContent: "center" }}>
+        <Button type="primary" htmlType="submit">
+          Criar
+        </Button>
+      </Form.Item>
+    </Form>
   );
 }

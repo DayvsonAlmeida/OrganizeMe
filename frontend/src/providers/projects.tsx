@@ -42,8 +42,6 @@ export function ProjectsProvider({ children }: ProjectsProviderProps) {
         setProjects(projects.map((p) => (p.id === project.id ? project : p)));
       }
 
-      console.log({ project, data, projects });
-
       return task;
     },
     [projects]
