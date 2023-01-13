@@ -28,9 +28,6 @@ export class ProjectInMemoryRepositoryAdapter
 
   async delete(project: DeleteProjectInput): Promise<void> {
     const idx = parseInt(project.id) - 1;
-    const hasProject = db[idx];
-
-    if (!hasProject) throw new Error();
 
     delete db[idx];
   }
