@@ -20,7 +20,8 @@ export class ToggleTaskController implements Controller<ToggleTaskInput> {
   async handle(request: Request): Promise<Http.Response> {
     const { body, params } = request;
     const isMissingParams = !params || !params.id;
-    const isMissingField = !body || !body.done;
+    const isMissingField =
+      !body || body.done === null || body.done === undefined;
 
     if (isMissingParams) return badRequest(new MissingParamError("id"));
     if (isMissingField) return badRequest(new MissingParamError("done"));

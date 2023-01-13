@@ -99,7 +99,7 @@ describe("ToggleTask Controller", () => {
     expect(httpResponse.body).toEqual(new ServerError());
   });
 
-  it("should return 200", async () => {
+  it("should return updated task to true", async () => {
     const { sut } = makeSut();
     const httpRequest: Request = {
       params: { id: "awesome-id" },
@@ -115,6 +115,25 @@ describe("ToggleTask Controller", () => {
       responsible: "Eren",
       deadLine: new Date("2023-1-13"),
       done: true,
+    });
+  });
+
+  it("should return updated task to false", async () => {
+    const { sut } = makeSut();
+    const httpRequest: Request = {
+      params: { id: "awesome-id" },
+      body: { done: false },
+    };
+
+    const httpResponse = await sut.handle(httpRequest);
+
+    expect(httpResponse.statusCode).toBe(200);
+    expect(httpResponse.body).toEqual({
+      id: "awesome-id",
+      name: "Join to the 104th Training Corps",
+      responsible: "Eren",
+      deadLine: new Date("2023-1-13"),
+      done: false,
     });
   });
 });
