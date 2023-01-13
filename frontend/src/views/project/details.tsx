@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { Card, Typography, Divider, Button, List, Modal } from "antd";
 import { CheckOutlined, DeleteOutlined, UndoOutlined } from "@ant-design/icons";
@@ -9,19 +9,21 @@ import { useProjects } from "../../hooks/projects";
 export function DetailsProjectPage() {
   const navigate = useNavigate();
   const location = useLocation();
-  const { removeProject, toggleTask, removeTask, projects } = useProjects();
+  const { removeProject, toggleTask, removeTask, addTask, projects } =
+    useProjects();
 
-  const { id, name, tasks: projectTasks } = location.state as Project;
+  const { id } = location.state as Project;
+
+  const currentProject = projects.find((p) => p.id === id) as Project;
 
   const [taskId, setTaskId] = useState("");
-  const [tasks, setTasks] = useState(projectTasks);
   const [isModalOpen, setIsModalOpen] = useState({
     project: false,
     task: false,
   });
 
-  const totalOfTasks = tasks.length;
-  const completedTasks = tasks.filter((t) => t.done).length;
+  const totalOfTasks = currentProject?.tasks.length;
+  const completedTasks = currentProject?.tasks.filter((t) => t.done).length;
 
   const handleOnCompleteTask = (task: Task) => {
     toggleTask({ id: task.id, done: task.done });
@@ -39,15 +41,17 @@ export function DetailsProjectPage() {
 
   const handleDeleteTask = () => {
     removeTask(taskId)
-      .then(() => {
-        setTasks((prev) => prev.filter((t) => t.id !== taskId));
-      })
+      .then(() => {})
       .finally(() => handleCancel("task"));
   };
 
   const handleCancel = (key: "project" | "task") => {
     setIsModalOpen((prev) => ({ ...prev, [key]: false }));
   };
+
+  useEffect(() => {
+    console.log("MUDOU");
+  }, [projects]);
 
   return (
     <>
@@ -62,7 +66,9 @@ export function DetailsProjectPage() {
               alignItems: "flex-start",
             }}
           >
-            <Typography.Title level={4}>{name}</Typography.Title>
+            <Typography.Title level={4}>
+              {currentProject?.name}
+            </Typography.Title>
             <DeleteOutlined onClick={() => showModal("project")} />
           </div>
           <Typography.Text
@@ -72,7 +78,7 @@ export function DetailsProjectPage() {
           <List
             size="small"
             bordered
-            dataSource={tasks}
+            dataSource={currentProject?.tasks}
             renderItem={(item: Task) => (
               <TaskItem
                 task={item}
@@ -87,6 +93,14 @@ export function DetailsProjectPage() {
           <Button
             type="primary"
             style={{ width: "fit-content", marginTop: 12 }}
+            onClick={() =>
+              addTask({
+                projectId: id,
+                deadLine: "15/01/2023",
+                name: "My Task",
+                responsible: "eu",
+              })
+            }
           >
             Criar Tarefa
           </Button>
