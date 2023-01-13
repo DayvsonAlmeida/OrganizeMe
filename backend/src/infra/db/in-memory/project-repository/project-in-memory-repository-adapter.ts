@@ -23,10 +23,7 @@ export class ProjectInMemoryRepositoryAdapter
     db.push(inMemoryProject);
     const id = db.length.toString();
 
-    return {
-      id,
-      name: project.name,
-    };
+    return { id, ...inMemoryProject };
   }
 
   async delete(project: DeleteProjectInput): Promise<void> {
@@ -38,15 +35,12 @@ export class ProjectInMemoryRepositoryAdapter
     delete db[idx];
   }
 
-  async find(project: FindProjectInput): Promise<Project | null> {
-    const idx = parseInt(project.id) - 1;
+  async find({ id }: FindProjectInput): Promise<Project | null> {
+    const idx = parseInt(id) - 1;
     const inMemoryProject = db.at(idx);
 
     if (!inMemoryProject) return null;
 
-    return {
-      id: project.id,
-      name: inMemoryProject.name,
-    };
+    return { id, ...inMemoryProject };
   }
 }
