@@ -10,6 +10,7 @@ import {
 import { createProject } from "../services/projects/create";
 import { deleteProject } from "../services/projects/delete";
 import { fetchProjects } from "../services/projects/list";
+import { toggleTask as toggle } from "../services/tasks/toggle";
 
 interface ProjectsProviderProps {
   children: ReactNode;
@@ -39,7 +40,21 @@ export function ProjectsProvider({ children }: ProjectsProviderProps) {
 
   const toggleTask = useCallback(
     async (data: ToggleTaskInput): Promise<Task> => {
-      throw new Error("Not implemented method!");
+      const toggledTask = await toggle(data);
+      const [projectId] = toggledTask.id.split("-");
+      const project = projects.find((p) => p.id === projectId);
+
+      if (project) {
+        project.tasks = project.tasks.map((t) =>
+          t.id === toggledTask.id ? toggledTask : t
+        );
+
+        setProjects((prev) =>
+          prev.map((p) => (p.id === project.id ? project : p))
+        );
+      }
+
+      return toggledTask;
     },
     []
   );

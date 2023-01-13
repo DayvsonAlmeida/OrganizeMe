@@ -9,7 +9,7 @@ import { useProjects } from "../../hooks/projects";
 export function DetailsProjectPage() {
   const navigate = useNavigate();
   const location = useLocation();
-  const { removeProject } = useProjects();
+  const { removeProject, toggleTask } = useProjects();
 
   const [isModalOpen, setIsModalOpen] = useState(false);
 
@@ -18,6 +18,7 @@ export function DetailsProjectPage() {
   const completedTasks = tasks.filter((t) => t.done).length;
 
   const handleOnCompleteTask = (task: Task) => {
+    toggleTask({ id: task.id, done: task.done });
     console.log({ task });
   };
 
