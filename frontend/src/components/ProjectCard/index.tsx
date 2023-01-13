@@ -1,4 +1,5 @@
 import { Avatar, Card, Typography } from "antd";
+import { stringToHexColor } from "../../utils/color";
 
 type ProjectCard = {
   name: string;
@@ -12,6 +13,7 @@ interface Props {
 
 export function ProjectCard(props: Props) {
   const { project } = props;
+  const backgroundColor = stringToHexColor(project.name);
   const description = `${project.completed} de ${project.totalOfTasks}`;
 
   return (
@@ -19,7 +21,7 @@ export function ProjectCard(props: Props) {
       bodyStyle={{ display: "flex", alignItems: "center" }}
       style={{ marginBottom: "0.5rem" }}
     >
-      <Avatar size="large" style={{ marginRight: "1rem" }} />
+      <Avatar size="large" style={{ marginRight: "1rem", backgroundColor }} />
       <div>
         <Typography.Title level={4} style={{ margin: 0 }}>
           {project.name}
