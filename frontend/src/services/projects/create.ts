@@ -1,6 +1,6 @@
 import { api } from "../api";
 import { Project } from "../../contexts/projects";
-import { ApiProject } from "./dto";
+import { ApiProject } from "../dto";
 
 type CreateProjectInput = {
   name: string;

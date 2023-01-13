@@ -1,5 +1,5 @@
 import { api } from "../api";
-import { ApiProject } from "./dto";
+import { ApiProject } from "../dto";
 import { Project } from "../../contexts/projects";
 
 export async function fetchProjects(): Promise<Project[]> {
