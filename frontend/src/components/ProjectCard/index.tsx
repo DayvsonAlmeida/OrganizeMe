@@ -1,14 +1,14 @@
 import { Avatar, Card, Typography } from "antd";
 import { stringToHexColor } from "../../utils/color";
 
-type ProjectCard = {
+export type ProjectCardType = {
   name: string;
   totalOfTasks: number;
   completed: number;
 };
 
 interface Props {
-  project: ProjectCard;
+  project: ProjectCardType;
 }
 
 export function ProjectCard(props: Props) {

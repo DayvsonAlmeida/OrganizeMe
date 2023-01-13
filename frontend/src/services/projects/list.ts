@@ -17,8 +17,6 @@ type ApiProject = {
 export async function fetchProjects() {
   const response = await api.get<ApiProject[]>("/api/projects");
 
-  console.log(response.data);
-
   return response.data.map((project) => ({
     id: project.id,
     name: project.name,
